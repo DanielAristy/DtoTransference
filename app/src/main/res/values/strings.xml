@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DtoTransference</string>
+    <string name="name">Name</string>
+    <string name="LastName">Last Name</string>
+    <string name="Save">Save</string>
+    <string name="checkDate">checkDate</string>
+</resources>
