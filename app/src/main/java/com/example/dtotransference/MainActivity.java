@@ -1,37 +1,104 @@
 package com.example.dtotransference;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dto.PersonaDTO;
 
-import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
     EditText txtName;
     EditText txtLastName;
-    DatePicker date;
+    TextView date;
+    DatePickerDialog datePickerDialog;
+    DatePickerDialog.OnDateSetListener dateSetListener;
+    private static final String TAG = "MainActivity";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         onInitComponent();
+        createDate();
 
     }
 
-    private void onInitComponent() {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Boolean  validar(LocalDate localDate){
+        Boolean verificar = false;
 
-        txtName = findViewById(R.id.txtName);
-        txtLastName = findViewById(R.id.txtLastName);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate ahora = LocalDate.now();
+
+        Period periodo = Period.between(localDate, ahora);
+
+        if (periodo.getYears() <18){
+            verificar= true;
+        }
+
+        return verificar;
+    }
+
+    private void createDate() {
+
+        date.setOnClickListener(new View.OnClickListener(){
+
+            int day, month, year;
+            @Override
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                day = calendar.get(Calendar.DAY_OF_MONTH);
+                month = calendar.get(Calendar.MONTH);
+                year = calendar.get(Calendar.YEAR);
+
+                datePickerDialog = new DatePickerDialog(
+                        MainActivity.this,
+                        android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                        dateSetListener,
+                        year,month,day);
+                datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                datePickerDialog.show();
+            }
+        });
+
+        dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int day) {
+                month = month + 1;
+                Log.d(TAG, "onDateSet: mm/dd/yyyy: " + month + "/" + day + "/" + year);
+
+                String dates = month + "/" + day + "/" + year;
+                LocalDate local = LocalDate.of(year,month,day);
+
+                if (validar(local) == true) {
+                    Toast.makeText(getApplicationContext(),"Menor de Edad",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    date.setText(dates);
+                }
+
+            }
+        };
     }
 
     public void saveData(View view) {
@@ -42,16 +109,21 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(getApplicationContext(),"saved",Toast.LENGTH_SHORT).show();
 
-
         Intent intent = new Intent(MainActivity.this,secondActivity.class);
 
         Bundle bundle = new Bundle();
         bundle.putSerializable("personaDto",personaDTO);
 
         intent.putExtras(bundle);
-
         startActivity(intent);
 
+    }
+
+    private void onInitComponent() {
+
+        txtName = findViewById(R.id.txtName);
+        txtLastName = findViewById(R.id.txtLastName);
+        date = findViewById(R.id.datePicker);
     }
 
     @Override
@@ -68,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("->","onResume()");
         txtName.setText("");
         txtLastName.setText("");
+        date.setText("");
     }
 
     @Override

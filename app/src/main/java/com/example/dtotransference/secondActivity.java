@@ -15,6 +15,7 @@ public class secondActivity extends AppCompatActivity {
 
     TextView txtName;
     TextView txtLastName;
+    TextView date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,6 @@ public class secondActivity extends AppCompatActivity {
         PersonaDTO personaDTO = (PersonaDTO) bundle.getSerializable("personaDto");
         txtName.setText(personaDTO.getName().toString());
         txtLastName.setText(personaDTO.getLastName().toString());
-
     }
 
     @Override

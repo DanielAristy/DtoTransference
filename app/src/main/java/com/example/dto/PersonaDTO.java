@@ -1,15 +1,13 @@
 package com.example.dto;
 
-import android.widget.DatePicker;
-
 import java.io.Serializable;
-import java.util.Date;
+
 
 public class PersonaDTO implements Serializable {
 
     private String name;
     private String lastName;
-    private DatePicker date;
+    private String date;
 
     public PersonaDTO(String name, String lastName) {
         this.name = name;
@@ -35,11 +33,11 @@ public class PersonaDTO implements Serializable {
         this.lastName = lastName;
     }
 
-    public DatePicker getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(DatePicker date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
