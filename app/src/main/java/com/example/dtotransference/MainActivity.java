@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
     DatePickerDialog datePickerDialog;
     DatePickerDialog.OnDateSetListener dateSetListener;
     private static final String TAG = "MainActivity";
-
-
+    public static final int MAYOR_DE_EDAD = 18;
+    public Boolean verificar = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +44,13 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Boolean  validar(LocalDate localDate){
-        Boolean verificar = false;
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate ahora = LocalDate.now();
 
         Period periodo = Period.between(localDate, ahora);
 
-        if (periodo.getYears() <18){
+        if (periodo.getYears() < MAYOR_DE_EDAD){
             verificar= true;
         }
 
@@ -92,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
                 if (validar(local) == true) {
                     Toast.makeText(getApplicationContext(),"Menor de Edad",Toast.LENGTH_SHORT).show();
+                    date.setText("");
+                    verificar = false;
                 }
                 else{
                     date.setText(dates);
@@ -107,15 +108,17 @@ public class MainActivity extends AppCompatActivity {
         personaDTO.setName(txtName.getText().toString());
         personaDTO.setLastName(txtLastName.getText().toString());
 
-        Toast.makeText(getApplicationContext(),"saved",Toast.LENGTH_SHORT).show();
+        if (verificar = true){
+            Toast.makeText(getApplicationContext(),"saved",Toast.LENGTH_SHORT).show();
 
-        Intent intent = new Intent(MainActivity.this,secondActivity.class);
+            Intent intent = new Intent(MainActivity.this,secondActivity.class);
 
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("personaDto",personaDTO);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("personaDto",personaDTO);
 
-        intent.putExtras(bundle);
-        startActivity(intent);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
 
     }
 
