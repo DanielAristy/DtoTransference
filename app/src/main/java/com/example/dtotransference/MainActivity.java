@@ -27,11 +27,13 @@ public class MainActivity extends AppCompatActivity {
     EditText txtName;
     EditText txtLastName;
     TextView date;
+    String birthDate;
+
     DatePickerDialog datePickerDialog;
     DatePickerDialog.OnDateSetListener dateSetListener;
     private static final String TAG = "MainActivity";
     public static final int MAYOR_DE_EDAD = 18;
-    public Boolean verificar = false;
+    public Boolean verificateDate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,22 +41,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         onInitComponent();
         createDate();
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public Boolean  validar(LocalDate localDate){
+    public Boolean validarFecha(int year,int month,int day){
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate ahora = LocalDate.now();
-
-        Period periodo = Period.between(localDate, ahora);
+        LocalDate local = LocalDate.of(year,month,day);
+        Period periodo = Period.between(local, ahora);
 
         if (periodo.getYears() < MAYOR_DE_EDAD){
-            verificar= true;
+            verificateDate = true;
         }
 
-        return verificar;
+        return verificateDate;
     }
 
     private void createDate() {
@@ -86,16 +87,16 @@ public class MainActivity extends AppCompatActivity {
                 month = month + 1;
                 Log.d(TAG, "onDateSet: mm/dd/yyyy: " + month + "/" + day + "/" + year);
 
-                String dates = month + "/" + day + "/" + year;
-                LocalDate local = LocalDate.of(year,month,day);
+                birthDate = month + "/" + day + "/" + year;
 
-                if (validar(local) == true) {
+                if (validarFecha(year,month,day) == true) {
                     Toast.makeText(getApplicationContext(),"Menor de Edad",Toast.LENGTH_SHORT).show();
                     date.setText("");
-                    verificar = false;
+                    verificateDate = false;
                 }
                 else{
-                    date.setText(dates);
+                    date.setText(birthDate);
+                    verificateDate = true;
                 }
 
             }
@@ -104,22 +105,32 @@ public class MainActivity extends AppCompatActivity {
 
     public void saveData(View view) {
 
-        PersonaDTO personaDTO = new PersonaDTO();
-        personaDTO.setName(txtName.getText().toString());
-        personaDTO.setLastName(txtLastName.getText().toString());
+        Boolean verificarCampos = false;
+        if (txtName.getText().toString().equals("")
+           || txtLastName.getText().toString().equals("")
+            || date.getText().toString().equals(""))
+        {
+            Toast.makeText(getApplicationContext(),"Todos los campos son obligatorios",Toast.LENGTH_SHORT).show();
+        }else{
+            verificarCampos = true;
+        }
 
-        if (verificar = true){
+        if (verificateDate.equals(true) && verificarCampos.equals(true)){
+
             Toast.makeText(getApplicationContext(),"saved",Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(MainActivity.this,secondActivity.class);
 
             Bundle bundle = new Bundle();
-            bundle.putSerializable("personaDto",personaDTO);
+            bundle.putSerializable("personaDto",
+                    new PersonaDTO(
+                            txtName.getText().toString()
+                            ,txtLastName.getText().toString())
+                        );
 
             intent.putExtras(bundle);
             startActivity(intent);
         }
-
     }
 
     private void onInitComponent() {
