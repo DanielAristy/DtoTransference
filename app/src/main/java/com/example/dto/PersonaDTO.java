@@ -44,6 +44,4 @@ public class PersonaDTO implements Serializable {
     public String toString(){
         return name+" "+lastName+" "+date;
     }
-
-
 }
